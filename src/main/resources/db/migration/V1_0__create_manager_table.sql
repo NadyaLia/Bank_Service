@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS manager;
+CREATE TABLE IF NOT EXISTS manager
+(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  user_id BINARY(16) NOT NULL,
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  status INT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+);
