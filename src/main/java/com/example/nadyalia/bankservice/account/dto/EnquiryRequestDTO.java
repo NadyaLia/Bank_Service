@@ -15,6 +15,4 @@ public class EnquiryRequestDTO {
     private UUID id;
 
     private String name;
-
-    private Client client;
 }

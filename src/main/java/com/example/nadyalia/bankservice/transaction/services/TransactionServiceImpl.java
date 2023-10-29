@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,9 +28,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional
     @Override
-    public BankResponseAccountDTO creditAccount(CreditDebitRequestDTO request) {
+    public BankResponseAccountDTO creditAccount(CreditDebitRequestDTO request, UUID clientId) {
 
-        Account found = accountRepository.findByAccountId(request.getId());
+        Account found = accountRepository.findByIdAndClientId(request.getId(), clientId);
         if (found == null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_NOT_EXISTS_CODE)
@@ -41,6 +42,16 @@ public class TransactionServiceImpl implements TransactionService {
         Account accountToCredit = accountRepository.findByAccountId(request.getId());
         accountToCredit.setBalance(accountToCredit.getBalance().add(request.getAmount()));
         accountRepository.save(accountToCredit);
+
+        Transaction transaction = new Transaction();
+        transaction.setId(UUID.randomUUID());
+        transaction.setType(1);
+        transaction.setCreditAccountId(accountToCredit.getId());
+        transaction.setAmount(request.getAmount());
+        transaction.setCreateDate(LocalDateTime.now());
+        transaction.setDescription("Cash");
+
+        repository.save(transaction);
 
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREDITED_SUCCESS)
@@ -78,6 +89,17 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             accountToDebit.setBalance(accountToDebit.getBalance().subtract(request.getAmount()));
             accountRepository.save(accountToDebit);
+
+            Transaction transaction = new Transaction();
+            transaction.setId(UUID.randomUUID());
+            transaction.setType(2);
+            transaction.setDebitAccountId(accountToDebit.getId());
+            transaction.setAmount(request.getAmount());
+            transaction.setCreateDate(LocalDateTime.now());
+            transaction.setDescription("Cash");
+
+            repository.save(transaction);
+
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_DEBITED_SUCCESS)
                     .responseMessage(AccountUtils.ACCOUNT_DEBITED_SUCCESS_MESSAGE)
@@ -116,6 +138,17 @@ public class TransactionServiceImpl implements TransactionService {
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
+
+        Transaction transaction = new Transaction();
+        transaction.setId(UUID.randomUUID());
+        transaction.setType(3);
+        transaction.setCreditAccountId(toAccount.getId());
+        transaction.setDebitAccountId(fromAccount.getId());
+        transaction.setAmount(request.getTransferAmount());
+        transaction.setCreateDate(LocalDateTime.now());
+        transaction.setDescription("Transfer");
+
+        repository.save(transaction);
 
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.TRANSFER_SUCCESS_CODE)

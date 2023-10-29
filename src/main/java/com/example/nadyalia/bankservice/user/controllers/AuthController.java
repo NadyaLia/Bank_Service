@@ -36,8 +36,8 @@ public class AuthController {
     private BCryptPasswordEncoder encoder;
 
     @Autowired
-    public AuthController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public AuthController() {
+
     }
 
     @PostMapping("/signin")
@@ -57,13 +57,13 @@ public class AuthController {
                     HttpStatus.FORBIDDEN);
         }
 
-        if(userRepository.existsByUsername(signUpDto.getUsername())) {
+        /*if(userRepository.existsByUsername(signUpDto.getUsername())) {
             return new ResponseEntity<>("Username is already taken!", HttpStatus.BAD_REQUEST);
         }
 
         if(userRepository.existsByEmail(signUpDto.getEmail())){
             return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
-        }
+        }*/
 
         // create user object
         User user = new User();
@@ -71,7 +71,7 @@ public class AuthController {
         user.setUsername(signUpDto.getUsername());
         user.setEmail(signUpDto.getEmail());
         user.setPassword(encoder.encode(signUpDto.getPassword()));
-        user.setType(signUpDto.getType());
+        user.setType("admin");
 
         Role roles = roleRepository.findByName("ROLE_ADMIN").get();
         user.setRoles(Collections.singleton(roles));

@@ -22,7 +22,5 @@ public class CreateOrUpdateAccountDTO {
 
     private int currencyCode;
 
-    private List<Agreement> agreements;
-
-    private Client client;
+    private UUID clientId;
 }

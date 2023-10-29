@@ -102,22 +102,23 @@ public class ManagerController {
     public ClientResponseDTO addClient(@RequestBody ClientCreateDTO createClient) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        String usernameManager = auth.getName();
 
-        User user = userRepository.findByUsername(username);
-        Manager manager = managerService.getByUserId(user.getId());
+        User userManager = userRepository.findByUsername(usernameManager);
+        Manager manager = managerService.getByUserId(userManager.getId());
 
         return clientService.addClient(createClient, manager.getId());
     }
 
-    @GetMapping("/allAccounts")
+    @GetMapping("/all-accounts")
     public List<Account> getAllAccounts() {
         return accountService.getAllAccounts();
     }
 
-    @PostMapping("/createAccount")
+    @PostMapping("/create-account")
     public BankResponseAccountDTO createAccount(@RequestBody CreateOrUpdateAccountDTO accountDTO) {
-        return accountService.createAccount(accountDTO);
+        Client client = clientService.getById(accountDTO.getClientId());
+        return accountService.createAccount(accountDTO, client);
     }
 
     @DeleteMapping("/account/delete/{accountId}")
@@ -130,12 +131,12 @@ public class ManagerController {
         accountService.deleteByName(name);
     }
 
-    @PutMapping("/updateAccount/{id}")
+    @PutMapping("/update-account/{id}")
     public BankResponseAccountDTO updateAccount(@PathVariable UUID id, @RequestBody CreateOrUpdateAccountDTO accountDTO) {
         return accountService.updateAccount(accountDTO);
     }
 
-    @GetMapping("/accountStatus")
+    @GetMapping("/account-status")
     public List<Account> getAllAccountsWhereStatusIs(@PathVariable String status) {
         return accountService.getAllAccountsWhereStatusIs(status);
     }

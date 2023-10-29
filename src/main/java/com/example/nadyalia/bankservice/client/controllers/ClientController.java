@@ -6,11 +6,16 @@ import com.example.nadyalia.bankservice.account.entity.Account;
 import com.example.nadyalia.bankservice.account.services.AccountService;
 import com.example.nadyalia.bankservice.agreement.entity.Agreement;
 import com.example.nadyalia.bankservice.agreement.services.AgreementService;
+import com.example.nadyalia.bankservice.client.entity.Client;
 import com.example.nadyalia.bankservice.client.services.ClientService;
 import com.example.nadyalia.bankservice.transaction.dto.CreditDebitRequestDTO;
 import com.example.nadyalia.bankservice.transaction.dto.TransferRequestDTO;
 import com.example.nadyalia.bankservice.transaction.services.TransactionService;
+import com.example.nadyalia.bankservice.user.entity.User;
+import com.example.nadyalia.bankservice.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +29,9 @@ public class ClientController {
     private ClientService clientService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private AccountService accountService;
 
     @Autowired
@@ -32,19 +40,34 @@ public class ClientController {
     @Autowired
     private AgreementService agreementService;
 
-    @GetMapping("/account/{clientId}")
-    public List<Account> getAccountsByClientId(@PathVariable UUID id) {
-        return accountService.getAccountsByClientId(id);
+    public Client getClientByAuth() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String usernameClient = auth.getName();
+
+        User userClient = userService.getByUsername(usernameClient);
+        Client client = clientService.getClientByUserId(userClient.getId());
+        return client;
     }
 
-    @GetMapping("/account/checkBalance")
+    @GetMapping("/account")
+    public List<Account> getAccountsByClientId() {
+        Client client = getClientByAuth();
+        return accountService.getAccountsByClientId(client.getId());
+
+    }
+
+    @GetMapping("/account/check-balance")
     public BankResponseAccountDTO balance(@PathVariable EnquiryRequestDTO requestDTO) {
-        return accountService.checkBalance(requestDTO);
+        Client client = getClientByAuth();
+
+        // get
+        return accountService.checkBalance(requestDTO.getId(), client.getId());
     }
 
     @PostMapping("/transaction/credit")
     public BankResponseAccountDTO creditAccount(@RequestBody CreditDebitRequestDTO requestDTO) {
-        return transactionService.creditAccount(requestDTO);
+        Client client = getClientByAuth();
+        return transactionService.creditAccount(requestDTO, client.getId());
     }
 
     @PostMapping("/transaction/debit")

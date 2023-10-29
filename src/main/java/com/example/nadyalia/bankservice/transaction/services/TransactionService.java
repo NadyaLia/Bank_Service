@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface TransactionService {
 
-    BankResponseAccountDTO creditAccount(CreditDebitRequestDTO request);
+    BankResponseAccountDTO creditAccount(CreditDebitRequestDTO request, UUID clientId);
 
     BankResponseAccountDTO debitAccount(CreditDebitRequestDTO request);
 

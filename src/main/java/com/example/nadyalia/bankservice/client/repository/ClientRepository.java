@@ -24,4 +24,6 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
             "OR account.id = transaction.credit_account_id" +
             "GROUP BY client.id HAVING transactionCount > ?1", nativeQuery = true)
     List<Client> findClientsWithTransactionCountGreaterThan(int transactionCount);
+
+    Client findByUserId(UUID id);
 }

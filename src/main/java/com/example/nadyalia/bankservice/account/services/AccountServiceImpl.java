@@ -4,6 +4,7 @@ import com.example.nadyalia.bankservice.account.dto.*;
 import com.example.nadyalia.bankservice.account.entity.Account;
 import com.example.nadyalia.bankservice.account.repository.AccountRepository;
 import com.example.nadyalia.bankservice.client.dto.EmailDTO;
+import com.example.nadyalia.bankservice.client.entity.Client;
 import com.example.nadyalia.bankservice.client.services.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -36,9 +37,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public BankResponseAccountDTO createAccount(CreateOrUpdateAccountDTO accountDTO) {
+    public BankResponseAccountDTO createAccount(CreateOrUpdateAccountDTO accountDTO, Client client) {
 
-        Account found = repository.findByNameAndClientId(accountDTO.getName(), accountDTO.getClient().getId());
+        Account found = repository.findByNameAndClientId(accountDTO.getName(), accountDTO.getId());
         if (found != null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_EXISTS_CODE)
@@ -54,8 +55,7 @@ public class AccountServiceImpl implements AccountService {
                 .status(Integer.parseInt("ACTIVE"))
                 .currencyCode(accountDTO.getCurrencyCode())
                 .balance(BigDecimal.ZERO)
-                .agreements(accountDTO.getAgreements())
-                .client(accountDTO.getClient())
+                .client(client)
                 .build();
 
         Account savedAccount = repository.save(newAccount);
@@ -83,9 +83,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BankResponseAccountDTO checkBalance(EnquiryRequestDTO request) {
+    public BankResponseAccountDTO checkBalance(UUID accountId, UUID clientId) {
 
-        Account found = repository.findByAccountId(request.getId());
+        Account found = repository.findByIdAndClientId(accountId, clientId);
         if (found == null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_NOT_EXISTS_CODE)
@@ -131,8 +131,7 @@ public class AccountServiceImpl implements AccountService {
         accountForUpdate.setName(accountDTO.getName());
         accountForUpdate.setType(accountDTO.getType());
         accountForUpdate.setCurrencyCode(accountDTO.getCurrencyCode());
-        accountForUpdate.setAgreements(accountDTO.getAgreements());
-        accountForUpdate.setClient(accountDTO.getClient());
+
 
         repository.save(accountForUpdate);
 

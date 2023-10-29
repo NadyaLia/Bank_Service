@@ -118,4 +118,9 @@ public class ClientServiceImpl implements ClientService {
     public List<Client> getAllClientsWhereTransactionMoreThan(int transactionCount) {
         return repository.findClientsWithTransactionCountGreaterThan(transactionCount);
     }
+
+    @Override
+    public Client getClientByUserId(UUID id) {
+        return repository.findByUserId(id);
+    }
 }

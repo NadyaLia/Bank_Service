@@ -18,6 +18,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Query(value = "SELECT id, name FROM account WHERE id = ?1", nativeQuery = true)
     Account findByAccountId(UUID id);
 
+    Account findByIdAndClientId(UUID id, UUID clientId);
+
     @Transactional
     void deleteById(UUID id);
 

@@ -25,4 +25,6 @@ public interface ClientService {
     List<Client> getAllClientsWhereBalanceMoreThan(BigDecimal balance);
 
     List<Client> getAllClientsWhereTransactionMoreThan(int transactionCount);
+
+    Client getClientByUserId(UUID id);
 }
