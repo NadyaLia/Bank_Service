@@ -9,14 +9,14 @@ import java.util.UUID;
 
 public interface AgreementRepository extends JpaRepository<Agreement, Integer> {
 
-    @Query(value = "SELECT agreement.id FROM agreement" +
-            "JOIN account ON agreement.account_id = account.id" +
-            "JOIN client ON account.client_id = client.id" +
+    @Query(value = "SELECT agreement.* FROM agreement " +
+            "JOIN account ON agreement.account_id = account.id " +
+            "JOIN client ON account.client_id = client.id " +
             "WHERE client.manager_id = ?1", nativeQuery = true)
     List<Agreement> findAgreementsByManagerId(int managerId);
 
-    @Query(value = "SELECT agreement.id FROM agreement" +
-            "JOIN account ON agreement.account_id = account.id" +
+    @Query(value = "SELECT agreement.* FROM agreement " +
+            "JOIN account ON agreement.account_id = account.id " +
             "WHERE account.client_id = ?1", nativeQuery = true)
     List<Agreement> findAgreementsWhereClientIdIs(UUID clientId);
 }

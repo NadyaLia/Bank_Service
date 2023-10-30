@@ -10,13 +10,11 @@ import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 
+    @Query(value = "SELECT account.* FROM account WHERE client_id = ?1", nativeQuery = true)
     List<Account> getAccountsByClientId(UUID clientId);
 
-    @Query(value = "SELECT name FROM account WHERE name = ?1 AND client_id = ?2", nativeQuery = true)
     Account findByNameAndClientId(String name, UUID clientId);
 
-    @Query(value = "SELECT id, name FROM account WHERE id = ?1", nativeQuery = true)
-    Account findByAccountId(UUID id);
 
     Account findByIdAndClientId(UUID id, UUID clientId);
 
@@ -28,8 +26,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     List<Account> findByStatus(int status);
 
-    @Query(value = "SELECT account.id, account.name FROM account" +
-            "JOIN agreement ON account.id = agreement.account_id" +
+    @Query(value = "SELECT account.* FROM account " +
+            "LEFT JOIN agreement ON account.id = agreement.account_id " +
             "WHERE agreement.product_id = ?1 and account.status = ?2", nativeQuery = true)
     List<Account> findByProductIdAndStatus(int productId, int status);
 }

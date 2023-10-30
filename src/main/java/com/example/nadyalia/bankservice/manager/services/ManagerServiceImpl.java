@@ -5,7 +5,6 @@ import com.example.nadyalia.bankservice.manager.repository.ManagerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -17,11 +16,6 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public Manager getById(int id) {
         return repository.findById(id).orElse(null);
-    }
-
-    @Override
-    public List<Manager> findAllManagersSortedByProductQuantity() {
-        return repository.findAllManagersSortedByProductQuantity();
     }
 
     @Override

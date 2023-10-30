@@ -3,7 +3,6 @@ package com.example.nadyalia.bankservice.account.services;
 import com.example.nadyalia.bankservice.account.dto.*;
 import com.example.nadyalia.bankservice.account.entity.Account;
 import com.example.nadyalia.bankservice.account.repository.AccountRepository;
-import com.example.nadyalia.bankservice.client.dto.EmailDTO;
 import com.example.nadyalia.bankservice.client.entity.Client;
 import com.example.nadyalia.bankservice.client.services.EmailService;
 import jakarta.transaction.Transactional;
@@ -12,6 +11,7 @@ import lombok.Builder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +39,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public BankResponseAccountDTO createAccount(CreateOrUpdateAccountDTO accountDTO, Client client) {
 
-        Account found = repository.findByNameAndClientId(accountDTO.getName(), accountDTO.getId());
+        Account found = repository.findByNameAndClientId(accountDTO.getName(), client.getId());
         if (found != null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_EXISTS_CODE)
@@ -52,26 +52,31 @@ public class AccountServiceImpl implements AccountService {
                 .id(UUID.randomUUID())
                 .name(accountDTO.getName())
                 .type(accountDTO.getType())
-                .status(Integer.parseInt("ACTIVE"))
+                .status(1)
                 .currencyCode(accountDTO.getCurrencyCode())
                 .balance(BigDecimal.ZERO)
                 .client(client)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
                 .build();
 
         Account savedAccount = repository.save(newAccount);
 
-        EmailDTO emailDTO = EmailDTO.builder()
+
+  /*      EmailDTO emailDTO = EmailDTO.builder()
                 .recipient(savedAccount.getClient().getEmail())
                 .subject("ACCOUNT CREATION")
                 .message("Congratulations! Your account has been successfully created.\nYour account details:\n" +
                         "Account name: " + savedAccount.getName() + "\nAccount number: " + savedAccount.getId())
                 .build();
-        emailService.sendEmailAlert(emailDTO);
+
+
+        emailService.sendEmailAlert(emailDTO);*/
 
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_SUCCESS)
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_MESSAGE)
-                .accountInfo(AccountInfoDTO.builder()
+                .accountInfo(AccountDTO.builder()
                         .id(savedAccount.getId())
                         .name(savedAccount.getName())
                         .balance(savedAccount.getBalance())
@@ -97,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_FOUND_SUCCESS)
-                .accountInfo(AccountInfoDTO.builder()
+                .accountInfo(AccountDTO.builder()
                         .balance(found.getBalance())
                         .id(found.getId())
                         .name(found.getName())
@@ -119,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public BankResponseAccountDTO updateAccount(CreateOrUpdateAccountDTO accountDTO) {
-        Account accountForUpdate = repository.findByAccountId(accountDTO.getId());
+        Account accountForUpdate = repository.findById(accountDTO.getId()).orElse(null);
         if (accountForUpdate == null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_NOT_EXISTS_CODE)
@@ -131,6 +136,7 @@ public class AccountServiceImpl implements AccountService {
         accountForUpdate.setName(accountDTO.getName());
         accountForUpdate.setType(accountDTO.getType());
         accountForUpdate.setCurrencyCode(accountDTO.getCurrencyCode());
+        accountForUpdate.setBalance(accountDTO.getBalance());
 
 
         repository.save(accountForUpdate);
@@ -138,7 +144,7 @@ public class AccountServiceImpl implements AccountService {
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_UPDATED_SUCCESS)
                 .responseMessage(AccountUtils.ACCOUNT_UPDATED_MESSAGE)
-                .accountInfo(AccountInfoDTO.builder()
+                .accountInfo(AccountDTO.builder()
                         .balance(accountForUpdate.getBalance())
                         .id(accountForUpdate.getId())
                         .name(accountForUpdate.getName())
@@ -148,15 +154,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<Account> getAllAccountsWhereStatusIs(String status) {
-        int statusInt = Integer.parseInt(status);
-        return repository.findByStatus(statusInt);
+    public List<Account> getAllAccountsWhereStatusIs(int status) {
+        return repository.findByStatus(status);
     }
 
     @Override
-    public List<Account> findAccountsWhereProductIdIsAndStatusIs(String productId, String status) {
-        int productIdInt = Integer.parseInt(productId);
-        int statusInt = Integer.parseInt(status);
-        return repository.findByProductIdAndStatus(productIdInt, statusInt);
+    public List<Account> findAccountsWhereProductIdIsAndStatusIs(int productId, int status) {
+
+        return repository.findByProductIdAndStatus(productId, status);
     }
 }

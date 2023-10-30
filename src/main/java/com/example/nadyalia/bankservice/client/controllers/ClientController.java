@@ -1,13 +1,16 @@
 package com.example.nadyalia.bankservice.client.controllers;
 
+import com.example.nadyalia.bankservice.account.dto.AccountDTO;
 import com.example.nadyalia.bankservice.account.dto.BankResponseAccountDTO;
 import com.example.nadyalia.bankservice.account.dto.EnquiryRequestDTO;
 import com.example.nadyalia.bankservice.account.entity.Account;
 import com.example.nadyalia.bankservice.account.services.AccountService;
+import com.example.nadyalia.bankservice.agreement.dto.AgreementDTO;
 import com.example.nadyalia.bankservice.agreement.entity.Agreement;
 import com.example.nadyalia.bankservice.agreement.services.AgreementService;
 import com.example.nadyalia.bankservice.client.entity.Client;
 import com.example.nadyalia.bankservice.client.services.ClientService;
+import com.example.nadyalia.bankservice.converters.ConverterToDTO;
 import com.example.nadyalia.bankservice.transaction.dto.CreditDebitRequestDTO;
 import com.example.nadyalia.bankservice.transaction.dto.TransferRequestDTO;
 import com.example.nadyalia.bankservice.transaction.services.TransactionService;
@@ -40,6 +43,9 @@ public class ClientController {
     @Autowired
     private AgreementService agreementService;
 
+    @Autowired
+    private ConverterToDTO converter;
+
     public Client getClientByAuth() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String usernameClient = auth.getName();
@@ -50,18 +56,16 @@ public class ClientController {
     }
 
     @GetMapping("/account")
-    public List<Account> getAccountsByClientId() {
+    public List<AccountDTO> getAccountsByClientId() {
         Client client = getClientByAuth();
-        return accountService.getAccountsByClientId(client.getId());
-
+        List<Account> accounts = accountService.getAccountsByClientId(client.getId());
+        return converter.fromAccountListToAccountDto(accounts);
     }
 
-    @GetMapping("/account/check-balance")
-    public BankResponseAccountDTO balance(@PathVariable EnquiryRequestDTO requestDTO) {
+    @GetMapping("/account/check-balance/{accountId}")
+    public BankResponseAccountDTO balance(@PathVariable UUID accountId) {
         Client client = getClientByAuth();
-
-        // get
-        return accountService.checkBalance(requestDTO.getId(), client.getId());
+        return accountService.checkBalance(accountId, client.getId());
     }
 
     @PostMapping("/transaction/credit")
@@ -72,18 +76,13 @@ public class ClientController {
 
     @PostMapping("/transaction/debit")
     public BankResponseAccountDTO debitAccount(@RequestBody CreditDebitRequestDTO requestDTO) {
-        return transactionService.debitAccount(requestDTO);
+        Client client = getClientByAuth();
+        return transactionService.debitAccount(requestDTO, client.getId());
     }
 
-    @PutMapping("/transaction/transfer/{sourceAccountId}/{destinationAccountId}")
-    public BankResponseAccountDTO transferBetweenAccounts(@PathVariable UUID  sourceAccountId,
-                                                          @PathVariable UUID destinationAccountId,
-                                                          @RequestBody TransferRequestDTO request) {
-        return transactionService.transferBetweenAccounts(sourceAccountId, destinationAccountId, request);
-    }
-
-    @GetMapping("/agreement/client/{clientId}")
-    public List<Agreement> findAgreementsWhereClientIdIs(@PathVariable String clientId) {
-        return agreementService.findAgreementsWhereClientIdIs(clientId);
+    @PutMapping("/transaction/transfer")
+    public BankResponseAccountDTO transferBetweenAccounts(@RequestBody TransferRequestDTO request) {
+        Client client = getClientByAuth();
+        return transactionService.transferBetweenAccounts(request, client.getId());
     }
 }

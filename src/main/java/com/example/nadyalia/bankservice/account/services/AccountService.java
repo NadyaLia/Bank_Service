@@ -2,8 +2,8 @@ package com.example.nadyalia.bankservice.account.services;
 
 import com.example.nadyalia.bankservice.account.dto.BankResponseAccountDTO;
 import com.example.nadyalia.bankservice.account.dto.CreateOrUpdateAccountDTO;
-import com.example.nadyalia.bankservice.account.dto.EnquiryRequestDTO;
 import com.example.nadyalia.bankservice.account.entity.Account;
+import com.example.nadyalia.bankservice.client.dto.ClientDTO;
 import com.example.nadyalia.bankservice.client.entity.Client;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public interface AccountService {
 
     BankResponseAccountDTO updateAccount(CreateOrUpdateAccountDTO accountDTO);
 
-    List<Account> getAllAccountsWhereStatusIs(String status);
+    List<Account> getAllAccountsWhereStatusIs(int status);
 
-    List<Account> findAccountsWhereProductIdIsAndStatusIs(String productId, String status);
+    List<Account> findAccountsWhereProductIdIsAndStatusIs(int productId, int status);
 }

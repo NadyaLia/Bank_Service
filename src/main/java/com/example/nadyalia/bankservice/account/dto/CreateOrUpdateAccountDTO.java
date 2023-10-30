@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,4 +24,6 @@ public class CreateOrUpdateAccountDTO {
     private int currencyCode;
 
     private UUID clientId;
+
+    private BigDecimal balance;
 }

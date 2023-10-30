@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AccountInfoDTO {
+public class AccountDTO {
 
     private UUID id;
 

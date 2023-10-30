@@ -15,5 +15,5 @@ public class BankResponseAccountDTO {
 
     private String responseMessage;
 
-    private AccountInfoDTO accountInfo;
+    private AccountDTO accountInfo;
 }

@@ -1,5 +1,7 @@
 package com.example.nadyalia.bankservice.client.services;
 
+import com.example.nadyalia.bankservice.client.entity.ClientWithTransactions;
+import com.example.nadyalia.bankservice.converters.ConverterToDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientResponseDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientCreateDTO;
 import com.example.nadyalia.bankservice.client.dto.ClientInfoDTO;
@@ -18,10 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -39,6 +39,8 @@ public class ClientServiceImpl implements ClientService {
 
     private UserRepository userRepository;
 
+    private ConverterToDTO converter;
+
     @Override
     public List<Client> getAll() {
        List<Client> clients = repository.findAll();
@@ -48,7 +50,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client getById(UUID id) {
-        return repository.findById(id).orElse(null);
+        Client client = repository.findById(id).orElse(null);
+        return client;
     }
 
     @Transactional
@@ -60,7 +63,7 @@ public class ClientServiceImpl implements ClientService {
         user.setUsername(createClient.getUsername());
         user.setEmail(createClient.getEmail());
         user.setPassword(encoder.encode(createClient.getPassword()));
-        user.setType("manager");
+        user.setType("client");
 
         Role roles = roleRepository.findByName("ROLE_CLIENT").get();
         user.setRoles(Collections.singleton(roles));
@@ -79,6 +82,8 @@ public class ClientServiceImpl implements ClientService {
                 .phoneNumber(createClient.getPhoneNumber())
                 .manager(manager)
                 .userId(user.getId())
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
                 .build();
 
         Client savedClient = repository.save(newClient);
@@ -115,7 +120,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<Client> getAllClientsWhereTransactionMoreThan(int transactionCount) {
+    public List<ClientWithTransactions> getAllClientsWhereTransactionMoreThan(int transactionCount) {
         return repository.findClientsWithTransactionCountGreaterThan(transactionCount);
     }
 

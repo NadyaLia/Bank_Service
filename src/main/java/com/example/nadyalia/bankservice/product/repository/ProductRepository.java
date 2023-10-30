@@ -10,10 +10,10 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    @Query(value = "SELECT id, name FROM product WHERE id IN " +
+    @Query(value = "SELECT product.* FROM product WHERE id IN " +
             "(SELECT product_id FROM agreement GROUP BY product_id HAVING COUNT(*) > ?1)", nativeQuery = true)
     List<Product> findProductsByAgreementsCountGreaterThan(int quantity);
 
-    @Query(value = "SELECT id, name FROM product WHERE updated_at > DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
+    @Query(value = "SELECT product.* FROM product WHERE updated_at > DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
     List<Product> findProductsChangedWithinLastWeek();
 }

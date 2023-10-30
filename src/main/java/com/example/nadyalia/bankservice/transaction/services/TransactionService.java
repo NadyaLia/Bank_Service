@@ -12,11 +12,11 @@ public interface TransactionService {
 
     BankResponseAccountDTO creditAccount(CreditDebitRequestDTO request, UUID clientId);
 
-    BankResponseAccountDTO debitAccount(CreditDebitRequestDTO request);
+    BankResponseAccountDTO debitAccount(CreditDebitRequestDTO request, UUID clientId);
 
-    BankResponseAccountDTO transferBetweenAccounts(UUID sourceAccount, UUID destinationAccount, TransferRequestDTO request);
+    BankResponseAccountDTO transferBetweenAccounts(TransferRequestDTO request, UUID clientId);
 
-    List<Transaction> findAllTransactionsWhereClientIdIs(String clientId);
+    List<Transaction> findAllTransactionsWhereClientIdIs(UUID clientId);
 
-    List<Transaction> findAllTransactionsWhereAccountCurrencyIs(String currency);
+    List<Transaction> findAllTransactionsWhereAccountCurrencyIs(int currency);
 }

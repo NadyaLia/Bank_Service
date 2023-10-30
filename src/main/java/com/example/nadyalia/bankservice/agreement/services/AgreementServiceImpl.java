@@ -15,14 +15,12 @@ public class AgreementServiceImpl implements AgreementService {
     private AgreementRepository repository;
 
     @Override
-    public List<Agreement> findAgreementsWhereManagerIDIs(String managerId) {
-        int managerIdInt = Integer.parseInt(managerId);
-        return repository.findAgreementsByManagerId(managerIdInt);
+    public List<Agreement> findAgreementsWhereManagerIDIs(int managerId) {
+        return repository.findAgreementsByManagerId(managerId);
     }
 
     @Override
-    public List<Agreement> findAgreementsWhereClientIdIs(String clientId) {
-        UUID clientUUID = UUID.fromString(clientId);
-        return repository.findAgreementsWhereClientIdIs(clientUUID);
+    public List<Agreement> findAgreementsWhereClientIdIs(UUID clientId) {
+        return repository.findAgreementsWhereClientIdIs(clientId);
     }
 }

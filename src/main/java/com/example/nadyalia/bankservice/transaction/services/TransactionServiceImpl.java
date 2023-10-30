@@ -1,6 +1,6 @@
 package com.example.nadyalia.bankservice.transaction.services;
 
-import com.example.nadyalia.bankservice.account.dto.AccountInfoDTO;
+import com.example.nadyalia.bankservice.account.dto.AccountDTO;
 import com.example.nadyalia.bankservice.account.dto.BankResponseAccountDTO;
 import com.example.nadyalia.bankservice.account.entity.Account;
 import com.example.nadyalia.bankservice.account.repository.AccountRepository;
@@ -30,8 +30,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public BankResponseAccountDTO creditAccount(CreditDebitRequestDTO request, UUID clientId) {
 
-        Account found = accountRepository.findByIdAndClientId(request.getId(), clientId);
-        if (found == null) {
+        Account accountToCredit = accountRepository.findByIdAndClientId(request.getId(), clientId);
+        if (accountToCredit == null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_NOT_EXISTS_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXISTS_MESSAGE)
@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
                     .build();
 
         }
-        Account accountToCredit = accountRepository.findByAccountId(request.getId());
+
         accountToCredit.setBalance(accountToCredit.getBalance().add(request.getAmount()));
         accountRepository.save(accountToCredit);
 
@@ -56,7 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREDITED_SUCCESS)
                 .responseMessage(AccountUtils.ACCOUNT_CREDITED_SUCCESS_MESSAGE)
-                .accountInfo(AccountInfoDTO.builder()
+                .accountInfo(AccountDTO.builder()
                         .name(accountToCredit.getName())
                         .balance(accountToCredit.getBalance())
                         .id(accountToCredit.getId())
@@ -66,10 +66,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional
     @Override
-    public BankResponseAccountDTO debitAccount(CreditDebitRequestDTO request) {
+    public BankResponseAccountDTO debitAccount(CreditDebitRequestDTO request, UUID clientId) {
 
-        Account found = accountRepository.findByAccountId(request.getId());
-        if (found == null) {
+        Account accountToDebit = accountRepository.findByIdAndClientId(request.getId(), clientId);
+        if (accountToDebit == null) {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_NOT_EXISTS_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXISTS_MESSAGE)
@@ -77,7 +77,7 @@ public class TransactionServiceImpl implements TransactionService {
                     .build();
 
         }
-        Account accountToDebit = accountRepository.findByAccountId(request.getId());
+
         BigInteger availableBalance = accountToDebit.getBalance().toBigInteger();
         BigInteger debitAmount = request.getAmount().toBigInteger();
         if (availableBalance.intValue() < debitAmount.intValue()) {
@@ -103,7 +103,7 @@ public class TransactionServiceImpl implements TransactionService {
             return BankResponseAccountDTO.builder()
                     .responseCode(AccountUtils.ACCOUNT_DEBITED_SUCCESS)
                     .responseMessage(AccountUtils.ACCOUNT_DEBITED_SUCCESS_MESSAGE)
-                    .accountInfo(AccountInfoDTO.builder()
+                    .accountInfo(AccountDTO.builder()
                             .id(accountToDebit.getId())
                             .name(accountToDebit.getName())
                             .balance(accountToDebit.getBalance())
@@ -114,10 +114,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional
     @Override
-    public BankResponseAccountDTO transferBetweenAccounts(UUID sourceAccount, UUID destinationAccount,
-                                                          TransferRequestDTO request) {
-        Account fromAccount = accountRepository.findByAccountId(request.getSourceAccountId());
-        Account toAccount = accountRepository.findByAccountId(request.getDestinationAccountId());
+    public BankResponseAccountDTO transferBetweenAccounts(TransferRequestDTO request, UUID clientId) {
+        Account fromAccount = accountRepository.findByIdAndClientId(request.getSourceAccountId(), clientId);
+        Account toAccount = accountRepository.findById(request.getDestinationAccountId()).orElse(null);
 
         if (fromAccount == null || toAccount == null) {
             return BankResponseAccountDTO.builder()
@@ -153,7 +152,7 @@ public class TransactionServiceImpl implements TransactionService {
         return BankResponseAccountDTO.builder()
                 .responseCode(AccountUtils.TRANSFER_SUCCESS_CODE)
                 .responseMessage(AccountUtils.TRANSFER_SUCCESS_MESSAGE)
-                .accountInfo(AccountInfoDTO.builder()
+                .accountInfo(AccountDTO.builder()
                         .id(fromAccount.getId())
                         .name(fromAccount.getName())
                         .balance(fromAccount.getBalance())
@@ -162,14 +161,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> findAllTransactionsWhereClientIdIs(String clientId) {
-        UUID clientUUID = UUID.fromString(clientId);
-        return repository.findByClientId(clientUUID);
+    public List<Transaction> findAllTransactionsWhereClientIdIs(UUID clientId) {
+
+        return repository.findByClientId(clientId);
     }
 
     @Override
-    public List<Transaction> findAllTransactionsWhereAccountCurrencyIs(String currency) {
-        int currencyCodeInt = Integer.parseInt(currency);
-        return repository.findByCurrencyCode(currencyCodeInt);
+    public List<Transaction> findAllTransactionsWhereAccountCurrencyIs(int currency) {
+
+        return repository.findByCurrencyCode(currency);
     }
 }

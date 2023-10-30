@@ -1,20 +1,26 @@
 package com.example.nadyalia.bankservice.manager.controllers;
 
+import com.example.nadyalia.bankservice.account.dto.AccountDTO;
 import com.example.nadyalia.bankservice.account.dto.BankResponseAccountDTO;
 import com.example.nadyalia.bankservice.account.dto.CreateOrUpdateAccountDTO;
 import com.example.nadyalia.bankservice.account.entity.Account;
 import com.example.nadyalia.bankservice.account.services.AccountService;
+import com.example.nadyalia.bankservice.agreement.dto.AgreementDTO;
 import com.example.nadyalia.bankservice.agreement.entity.Agreement;
 import com.example.nadyalia.bankservice.agreement.services.AgreementService;
-import com.example.nadyalia.bankservice.client.dto.ClientInfoDTO;
+import com.example.nadyalia.bankservice.client.dto.ClientDTO;
 import com.example.nadyalia.bankservice.client.entity.Client;
+import com.example.nadyalia.bankservice.client.entity.ClientWithTransactions;
+import com.example.nadyalia.bankservice.converters.ConverterToDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientResponseDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientCreateDTO;
 import com.example.nadyalia.bankservice.client.services.ClientService;
 import com.example.nadyalia.bankservice.manager.entity.Manager;
 import com.example.nadyalia.bankservice.manager.services.ManagerService;
+import com.example.nadyalia.bankservice.product.dto.ProductDTO;
 import com.example.nadyalia.bankservice.product.entity.Product;
 import com.example.nadyalia.bankservice.product.services.ProductService;
+import com.example.nadyalia.bankservice.transaction.dto.TransactionDTO;
 import com.example.nadyalia.bankservice.transaction.entity.Transaction;
 import com.example.nadyalia.bankservice.transaction.services.TransactionService;
 import com.example.nadyalia.bankservice.user.entity.User;
@@ -24,7 +30,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,24 +58,19 @@ public class ManagerController {
     @Autowired
     private AgreementService agreementService;
 
-    @GetMapping("/all-clients")
-    public List<ClientInfoDTO> getAll() {
-        List<Client> clients = clientService.getAll();
+    @Autowired
+    private ConverterToDTO converter;
 
-        List<ClientInfoDTO> dtos = new ArrayList<>();
-        for (Client client : clients) {
-            ClientInfoDTO d = new ClientInfoDTO();
-            d.setId(client.getId());
-            d.setFirstName(client.getFirstName());
-            d.setLastName(client.getLastName());
-            dtos.add(d);
-        }
-        return dtos;
+    @GetMapping("/all-clients")
+    public List<ClientDTO> getAll() {
+        List<Client> clients = clientService.getAll();
+        return converter.fromClientListToClientDto(clients);
     }
 
     @GetMapping("/client/{clientId}")
-    public Client getById(@PathVariable UUID clientId) {
-        return clientService.getById(clientId);
+    public ClientDTO getById(@PathVariable UUID clientId) {
+        Client client =  clientService.getById(clientId);
+        return converter.fromClientToClientDto(client);
     }
 
     @DeleteMapping("/client/{clientId}")
@@ -78,24 +78,20 @@ public class ManagerController {
         clientService.deleteById(clientId);
     }
 
-    @GetMapping("/clientCount")
+    @GetMapping("/client-count")
     public int getCount() {
         return clientService.getCount();
     }
 
-    @GetMapping("/clientActive")
-    public List<Client> getAllClientsWhereStatusIsActive() {
-        return clientService.getAllClientsWhereStatusIsActive();
+    @GetMapping("/client-active")
+    public List<ClientDTO> getAllClientsWhereStatusIsActive() {
+        List<Client> clients = clientService.getAllClientsWhereStatusIsActive();
+        return converter.fromClientListToClientDto(clients);
     }
 
     @GetMapping("/client/transaction/{transactionCount}")
-    public List<Client> getAllClientsWhereTransactionMoreThan(@PathVariable int transactionCount) {
+    public List<ClientWithTransactions> getAllClientsWhereTransactionMoreThan(@PathVariable int transactionCount) {
         return clientService.getAllClientsWhereTransactionMoreThan(transactionCount);
-    }
-
-    @GetMapping("/sorted")
-    public List<Manager> findAllManagersSortedByProductQuantity() {
-        return managerService.findAllManagersSortedByProductQuantity();
     }
 
     @PostMapping("/add-client")
@@ -111,8 +107,9 @@ public class ManagerController {
     }
 
     @GetMapping("/all-accounts")
-    public List<Account> getAllAccounts() {
-        return accountService.getAllAccounts();
+    public List<AccountDTO> getAllAccounts() {
+        List<Account> accounts = accountService.getAllAccounts();
+        return converter.fromAccountListToAccountDto(accounts);
     }
 
     @PostMapping("/create-account")
@@ -126,49 +123,61 @@ public class ManagerController {
         accountService.deleteById(accountId);
     }
 
-    @DeleteMapping("/account/delete/accountName/{name}")
+    @DeleteMapping("/account/delete/account-name/{name}")
     public void deleteByName(@PathVariable String name) {
         accountService.deleteByName(name);
     }
 
-    @PutMapping("/update-account/{id}")
-    public BankResponseAccountDTO updateAccount(@PathVariable UUID id, @RequestBody CreateOrUpdateAccountDTO accountDTO) {
+    @PutMapping("/update-account")
+    public BankResponseAccountDTO updateAccount(@RequestBody CreateOrUpdateAccountDTO accountDTO) {
         return accountService.updateAccount(accountDTO);
     }
 
-    @GetMapping("/account-status")
-    public List<Account> getAllAccountsWhereStatusIs(@PathVariable String status) {
-        return accountService.getAllAccountsWhereStatusIs(status);
+    @GetMapping("/account-status/{status}")
+    public List<AccountDTO> getAllAccountsWhereStatusIs(@PathVariable int status) {
+        List<Account> accounts = accountService.getAllAccountsWhereStatusIs(status);
+        return converter.fromAccountListToAccountDto(accounts);
     }
 
     @GetMapping("/account/{productId}/{status}")
-    public List<Account> findAccountsWhereProductIdIsAndStatusIs(@PathVariable String productId,
-                                                                 @PathVariable String status) {
-        return accountService.findAccountsWhereProductIdIsAndStatusIs(productId, status);
+    public List<AccountDTO> findAccountsWhereProductIdIsAndStatusIs(@PathVariable int productId,
+                                                                    @PathVariable int status) {
+        List<Account> accounts = accountService.findAccountsWhereProductIdIsAndStatusIs(productId, status);
+        return converter.fromAccountListToAccountDto(accounts);
     }
 
     @GetMapping("/transaction/{clientId}")
-    public List<Transaction> findAllTransactionsWhereClientIdIs(@PathVariable String clientId) {
+    public List<Transaction> findAllTransactionsWhereClientIdIs(@PathVariable UUID clientId) {
         return transactionService.findAllTransactionsWhereClientIdIs(clientId);
     }
 
-    @GetMapping("/transaction/{currency}")
-    public List<Transaction> findAllTransactionsWhereAccountCurrencyIs(@PathVariable String currency) {
-        return transactionService.findAllTransactionsWhereAccountCurrencyIs(currency);
+    @GetMapping("/transaction/currency/{currency}")
+    public List<TransactionDTO> findAllTransactionsWhereAccountCurrencyIs(@PathVariable int currency) {
+        List<Transaction> transactions = transactionService.findAllTransactionsWhereAccountCurrencyIs(currency);
+        return converter.fromTransactionListToTransactionDto(transactions);
     }
 
     @GetMapping("/product/agreements/{quantity}")
-    public List<Product> findAllProductsWhereAgreementsQuantityMoreThan(@PathVariable int quantity) {
-        return productService.findAllProductsWhereAgreementsQuantityMoreThan(quantity);
+    public List<ProductDTO> findAllProductsWhereAgreementsQuantityMoreThan(@PathVariable int quantity) {
+        List<Product> products = productService.findAllProductsWhereAgreementsQuantityMoreThan(quantity);
+        return converter.fromProductListToProductDto(products);
     }
 
     @GetMapping("/product/changed")
-    public List<Product> findAllChangedProducts() {
-        return productService.findAllChangedProducts();
+    public List<ProductDTO> findAllChangedProducts() {
+        List<Product> products = productService.findAllChangedProducts();
+        return converter.fromProductListToProductDto(products);
     }
 
     @GetMapping("/agreement/manager/{managerId}")
-    public List<Agreement> findAgreementsWhereManagerIDIs(@PathVariable String managerId) {
-        return agreementService.findAgreementsWhereManagerIDIs(managerId);
+    public List<AgreementDTO> findAgreementsWhereManagerIDIs(@PathVariable int managerId) {
+        List<Agreement> agreements = agreementService.findAgreementsWhereManagerIDIs(managerId);
+        return converter.fromAgreementListToAgreementDto(agreements);
+    }
+
+    @GetMapping("/agreement/client/{clientId}")
+    public List<AgreementDTO> findAgreementsWhereClientIdIs(@PathVariable UUID clientId) {
+        List<Agreement> agreements = agreementService.findAgreementsWhereClientIdIs(clientId);
+        return converter.fromAgreementListToAgreementDto(agreements);
     }
 }
