@@ -14,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -80,4 +81,42 @@ public class Client {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
     private List<Account> accounts;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Client client = (Client) o;
+        return status == client.status && Objects.equals(id, client.id) && Objects.equals(taxCode, client.taxCode) &&
+                Objects.equals(firstName, client.firstName) && Objects.equals(lastName, client.lastName) &&
+                Objects.equals(userId, client.userId) && Objects.equals(email, client.email) && Objects.equals(address,
+                client.address) && Objects.equals(phoneNumber, client.phoneNumber) && Objects.equals(createDate,
+                client.createDate) && Objects.equals(updateDate, client.updateDate) && Objects.equals(manager,
+                client.manager) && Objects.equals(accounts, client.accounts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, status, taxCode, firstName, lastName, userId, email, address, phoneNumber, createDate,
+                updateDate, manager, accounts);
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", status=" + status +
+                ", taxCode='" + taxCode + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userId=" + userId +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                ", manager=" + manager +
+                ", accounts=" + accounts +
+                '}';
+    }
 }

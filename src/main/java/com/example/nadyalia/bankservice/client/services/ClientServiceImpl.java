@@ -28,7 +28,6 @@ import java.util.*;
 @Builder
 public class ClientServiceImpl implements ClientService {
 
-
     private ClientRepository repository;
 
     private ManagerService managerService;
@@ -44,8 +43,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<Client> getAll() {
        List<Client> clients = repository.findAll();
-
-        return new ArrayList<>(clients);
+       return new ArrayList<>(clients);
     }
 
     @Override

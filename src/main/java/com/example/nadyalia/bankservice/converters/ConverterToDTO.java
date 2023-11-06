@@ -19,34 +19,35 @@ import java.util.List;
 @Service
 public class ConverterToDTO {
     private final ModelMapper modelMapper = new ModelMapper();
+
     public ClientDTO fromClientToClientDto(Client client) {
         return modelMapper.map(client, ClientDTO.class);
-   }
+    }
 
-   public AccountDTO fromAccountToAccountDto(Account account) {
+    public AccountDTO fromAccountToAccountDto(Account account) {
         return modelMapper.map(account, AccountDTO.class);
-   }
+    }
 
-   public ProductDTO fromProductToProductDto(Product product) {
+    public ProductDTO fromProductToProductDto(Product product) {
         return modelMapper.map(product, ProductDTO.class);
-   }
+    }
 
-   public AgreementDTO fromAgreementToAgreementDto(Agreement agreement) {
+    public AgreementDTO fromAgreementToAgreementDto(Agreement agreement) {
         return modelMapper.map(agreement, AgreementDTO.class);
-   }
+    }
 
-   public TransactionDTO fromTransactionToTransactionDto(Transaction transaction) {
+    public TransactionDTO fromTransactionToTransactionDto(Transaction transaction) {
         return modelMapper.map(transaction, TransactionDTO.class);
-   }
+    }
 
-   public List<ClientDTO> fromClientListToClientDto(List<Client> clients) {
+    public List<ClientDTO> fromClientListToClientDto(List<Client> clients) {
         List<ClientDTO> dtos = new ArrayList<>();
-       for (Client client : clients) {
-           ClientDTO dto = fromClientToClientDto(client);
-           dtos.add(dto);
-       }
-       return dtos;
-   }
+        for (Client client : clients) {
+            ClientDTO dto = fromClientToClientDto(client);
+            dtos.add(dto);
+        }
+        return dtos;
+    }
 
     public List<AccountDTO> fromAccountListToAccountDto(List<Account> accounts) {
         List<AccountDTO> dtos = new ArrayList<>();
