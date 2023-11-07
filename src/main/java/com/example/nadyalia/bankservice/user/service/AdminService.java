@@ -75,6 +75,11 @@ public class AdminService {
         product.setInterestRate(new BigDecimal(6));
         productRepository.save(product);
 
-        return null;
+        ManagerResponseDTO res = new ManagerResponseDTO();
+        res.setManagerName(manager.getLastName());
+        res.setRole(roles);
+        res.setEmail(user.getEmail());
+        res.setId(manager.getId());
+        return res;
     }
 }
