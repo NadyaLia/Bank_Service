@@ -1,8 +1,10 @@
 package com.example.nadyalia.bankservice.user.controllers;
 
 import com.example.nadyalia.bankservice.user.dto.ManagerResponseDTO;
+import com.example.nadyalia.bankservice.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc
 class AdminControllerTest {
 
+    @Autowired
+    private UserRepository userRepository;
     @LocalServerPort
     private int port;
     private TestRestTemplate template = new TestRestTemplate();
@@ -29,6 +33,9 @@ class AdminControllerTest {
 
     @Test
     public void addManagerSuccess() {
+
+        userRepository.makeUsernameOld("nl2");
+
         // given
         String url = baseUrl + "/add-manager";
         String managerJson = """

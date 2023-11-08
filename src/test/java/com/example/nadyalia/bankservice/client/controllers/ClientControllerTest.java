@@ -4,8 +4,10 @@ import com.example.nadyalia.bankservice.account.dto.AccountDTO;
 import com.example.nadyalia.bankservice.account.dto.BankResponseAccountDTO;
 import com.example.nadyalia.bankservice.transaction.dto.CreditDebitRequestDTO;
 import com.example.nadyalia.bankservice.transaction.dto.TransferRequestDTO;
+import com.example.nadyalia.bankservice.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -29,6 +31,9 @@ class ClientControllerTest {
     private HttpHeaders headers = new HttpHeaders();
     private String baseUrl;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     public void setUp() {
         baseUrl = "http://localhost:" + port + "/client";
@@ -38,6 +43,10 @@ class ClientControllerTest {
 
     @Test
     public void getAccountsByClientIdSuccess() {
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth("tonystark", "tony");
+
         // given
         String url = baseUrl + "/account";
 
@@ -56,6 +65,7 @@ class ClientControllerTest {
 
     @Test
     public void balanceCheckSuccess() {
+
         // given
         UUID accountId = UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479");
         String url = baseUrl + "/account/check-balance/" + accountId;

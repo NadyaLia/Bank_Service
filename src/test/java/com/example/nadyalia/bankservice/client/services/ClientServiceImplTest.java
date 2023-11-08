@@ -55,6 +55,7 @@ class ClientServiceImplTest {
 
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
     }
 
@@ -197,7 +198,7 @@ class ClientServiceImplTest {
         createClient.setFirstName("Nadja");
         createClient.setLastName("Kuk");
 
-        Integer managerId = 1;
+        int managerId = 1;
         Manager manager = new Manager();
         manager.setId(managerId);
 

@@ -52,7 +52,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignUpDTO signUpDto){
 
-        if(userRepository.count() > 0){
+        if(userRepository.existsByType("admin")){
             return new ResponseEntity<>("Registration is not allowed. An admin user already exists.",
                     HttpStatus.FORBIDDEN);
         }
