@@ -1,6 +1,7 @@
 package com.example.nadyalia.bankservice.client.services;
 
 import com.example.nadyalia.bankservice.client.entity.ClientWithTransactions;
+import com.example.nadyalia.bankservice.client.exceptions.ClientNotFoundException;
 import com.example.nadyalia.bankservice.converters.ConverterToDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientResponseDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientCreateDTO;
@@ -48,8 +49,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client getById(UUID id) {
-        Client client = repository.findById(id).orElse(null);
-        return client;
+        return repository.findById(id).orElseThrow(() -> new ClientNotFoundException("Client with id = " + id + " not found"));
     }
 
     @Transactional

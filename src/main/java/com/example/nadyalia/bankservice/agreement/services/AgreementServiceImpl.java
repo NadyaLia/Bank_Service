@@ -1,6 +1,7 @@
 package com.example.nadyalia.bankservice.agreement.services;
 
 import com.example.nadyalia.bankservice.agreement.entity.Agreement;
+import com.example.nadyalia.bankservice.agreement.exceptions.AgreementNotFoundException;
 import com.example.nadyalia.bankservice.agreement.repository.AgreementRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,19 @@ public class AgreementServiceImpl implements AgreementService {
 
     @Override
     public List<Agreement> findAgreementsWhereManagerIDIs(int managerId) {
-        return repository.findAgreementsByManagerId(managerId);
+        List<Agreement> agreements = repository.findAgreementsByManagerId(managerId);
+        if (agreements.isEmpty()) {
+            throw new AgreementNotFoundException("No agreements found for manager with ID: " + managerId);
+        }
+        return agreements;
     }
 
     @Override
     public List<Agreement> findAgreementsWhereClientIdIs(UUID clientId) {
-        return repository.findAgreementsWhereClientIdIs(clientId);
+        List<Agreement> agreements = repository.findAgreementsWhereClientIdIs(clientId);
+        if (agreements.isEmpty()) {
+            throw new AgreementNotFoundException("No agreements found for client with ID: " + clientId);
+        }
+        return agreements;
     }
 }

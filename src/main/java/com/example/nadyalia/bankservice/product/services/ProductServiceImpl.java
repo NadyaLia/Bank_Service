@@ -1,6 +1,7 @@
 package com.example.nadyalia.bankservice.product.services;
 
 import com.example.nadyalia.bankservice.product.entity.Product;
+import com.example.nadyalia.bankservice.product.exceptions.ProductNotFoundException;
 import com.example.nadyalia.bankservice.product.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAllProductsWhereAgreementsQuantityMoreThan(int quantity) {
-        return repository.findProductsByAgreementsCountGreaterThan(quantity);
+        List<Product> products = repository.findProductsByAgreementsCountGreaterThan(quantity);
+        if (products.isEmpty()) {
+            throw new ProductNotFoundException("No products found with agreements count greater than " + quantity);
+        }
+        return products;
     }
 
     @Override
     public List<Product> findAllChangedProducts() {
-        return repository.findProductsChangedWithinLastWeek();
+        List<Product> products = repository.findProductsChangedWithinLastWeek();
+        if (products.isEmpty()) {
+            throw new ProductNotFoundException("There are no changed within last week products");
+        }
+        return products;
     }
 }
