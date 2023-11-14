@@ -2,6 +2,7 @@ package com.example.nadyalia.bankservice.client.services;
 
 import com.example.nadyalia.bankservice.client.entity.Client;
 import com.example.nadyalia.bankservice.client.entity.ClientWithTransactions;
+import com.example.nadyalia.bankservice.client.exceptions.ClientNotFoundException;
 import com.example.nadyalia.bankservice.client.repository.ClientRepository;
 import com.example.nadyalia.bankservice.converters.ConverterToDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientCreateDTO;
@@ -111,10 +112,12 @@ class ClientServiceImplTest {
         when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
 
         // when
-        Client returnedClient = clientService.getById(clientId);
+        Exception exception = assertThrows(ClientNotFoundException.class, () -> {
+            clientService.getById(clientId);
+        });
 
         // then
-        assertNull(returnedClient);
+        assertTrue(exception.getMessage().contains("Client with id = " + clientId + " not found"));
     }
 
     @Test
