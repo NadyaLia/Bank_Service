@@ -24,7 +24,7 @@ RESTful API to simulate simple banking operations.
 git clone git@github.com:NadyaLia/Bank_Service.git
 ```
 2. Default port for the api is 8080
-3. MySQL database initialized with some sample user.
+3. MySQL database initialized with some sample users.
 
 ### Functional services
 The microservice will implement CRUD operations for various entities related to banking operations. This

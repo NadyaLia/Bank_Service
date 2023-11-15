@@ -6,6 +6,8 @@ import com.example.nadyalia.bankservice.user.dto.LoginDTO;
 import com.example.nadyalia.bankservice.user.dto.SignUpDTO;
 import com.example.nadyalia.bankservice.user.entity.User;
 import com.example.nadyalia.bankservice.user.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication controller", description = "This controller manages the initial user/admin registration " +
+        "process and handles user authentication. It provides endpoints for registering the first admin user and for " +
+        "user login.")
 public class AuthController {
 
     @Autowired
@@ -41,6 +46,10 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
+    @Operation(
+            summary = "User Sign-in",
+            description = "Authenticates a user and allows sign-in. Returns a success message upon successful authentication."
+    )
     public ResponseEntity<String> authenticateUser(@RequestBody LoginDTO loginDto){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(), loginDto.getPassword()));
@@ -50,6 +59,10 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @Operation(
+            summary = "Admin registration",
+            description = "Registers a new admin user. Registration is restricted if an admin user already exists."
+    )
     public ResponseEntity<?> registerUser(@RequestBody SignUpDTO signUpDto){
 
         if(userRepository.existsByType("admin")){

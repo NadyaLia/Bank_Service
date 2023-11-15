@@ -25,6 +25,8 @@ import com.example.nadyalia.bankservice.transaction.entity.Transaction;
 import com.example.nadyalia.bankservice.transaction.services.TransactionService;
 import com.example.nadyalia.bankservice.user.entity.User;
 import com.example.nadyalia.bankservice.user.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/manager")
+@Tag(name = "Manager Controller", description = "Controller for managing clients, accounts, transactions, products " +
+        "and agreements.")
 public class ManagerController {
 
     @Autowired
@@ -62,6 +66,10 @@ public class ManagerController {
     private ConverterToDTO converter;
 
     @GetMapping("/all-clients")
+    @Operation(
+            summary = "Get all clients",
+            description = "Retrieves a list of all clients."
+    )
     public List<ClientDTO> getAll() {
         List<Client> clients = clientService.getAll();
         return converter.fromClientListToClientDto(clients);
@@ -90,11 +98,19 @@ public class ManagerController {
     }
 
     @GetMapping("/client/transaction/{transactionCount}")
+    @Operation(
+            summary = "Get clients by transaction count",
+            description = "Retrieves clients with a transaction count greater than the specified number."
+    )
     public List<ClientWithTransactions> getAllClientsWhereTransactionMoreThan(@PathVariable int transactionCount) {
         return clientService.getAllClientsWhereTransactionMoreThan(transactionCount);
     }
 
     @PostMapping("/add-client")
+    @Operation(
+            summary = "Add new client",
+            description = "Creates a new client and associates it with the currently authenticated manager."
+    )
     public ClientResponseDTO addClient(@RequestBody ClientCreateDTO createClient) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -140,6 +156,10 @@ public class ManagerController {
     }
 
     @GetMapping("/account/{productId}/{status}")
+    @Operation(
+            summary = "Find accounts by product ID and status",
+            description = "Finds accounts associated with a specific product ID and having a certain status."
+    )
     public List<AccountDTO> findAccountsWhereProductIdIsAndStatusIs(@PathVariable int productId,
                                                                     @PathVariable int status) {
         List<Account> accounts = accountService.findAccountsWhereProductIdIsAndStatusIs(productId, status);
@@ -152,18 +172,30 @@ public class ManagerController {
     }
 
     @GetMapping("/transaction/currency/{currency}")
+    @Operation(
+            summary = "Find transactions by currency",
+            description = "Finds all transactions conducted in a specific currency."
+    )
     public List<TransactionDTO> findAllTransactionsWhereAccountCurrencyIs(@PathVariable int currency) {
         List<Transaction> transactions = transactionService.findAllTransactionsWhereAccountCurrencyIs(currency);
         return converter.fromTransactionListToTransactionDto(transactions);
     }
 
     @GetMapping("/product/agreements/{quantity}")
+    @Operation(
+            summary = "Find products by agreement quantity",
+            description = "Finds products associated with more than a specified number of agreements."
+    )
     public List<ProductDTO> findAllProductsWhereAgreementsQuantityMoreThan(@PathVariable int quantity) {
         List<Product> products = productService.findAllProductsWhereAgreementsQuantityMoreThan(quantity);
         return converter.fromProductListToProductDto(products);
     }
 
     @GetMapping("/product/changed")
+    @Operation(
+            summary = "Find recently changed products",
+            description = "Finds products that have undergone changes within the last week."
+    )
     public List<ProductDTO> findAllChangedProducts() {
         List<Product> products = productService.findAllChangedProducts();
         return converter.fromProductListToProductDto(products);
