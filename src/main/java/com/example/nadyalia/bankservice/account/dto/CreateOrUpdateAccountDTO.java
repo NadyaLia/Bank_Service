@@ -1,13 +1,10 @@
 package com.example.nadyalia.bankservice.account.dto;
 
-import com.example.nadyalia.bankservice.agreement.entity.Agreement;
-import com.example.nadyalia.bankservice.client.entity.Client;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Data

@@ -1,7 +1,5 @@
 package com.example.nadyalia.bankservice.client.services;
 
-import com.example.nadyalia.bankservice.client.dto.ClientDTO;
-import com.example.nadyalia.bankservice.client.dto.ClientInfoDTO;
 import com.example.nadyalia.bankservice.client.entity.ClientWithTransactions;
 import com.example.nadyalia.bankservice.manager.dto.ClientResponseDTO;
 import com.example.nadyalia.bankservice.manager.dto.ClientCreateDTO;

@@ -1,6 +1,5 @@
 package com.example.nadyalia.bankservice.account.dto;
 
-import com.example.nadyalia.bankservice.client.entity.Client;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

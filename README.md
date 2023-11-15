@@ -27,12 +27,23 @@ git clone git@github.com:NadyaLia/Bank_Service.git
 3. MySQL database initialized with some sample users.
 
 ### Functional services
-The microservice will implement CRUD operations for various entities related to banking operations. This
-includes:
-- Client Management: Managing client information and profiles.
-- Account Management: Creating, updating, and deleting client accounts.
-- Balance Inquiry: Retrieving account balances and transaction history.
-- Transaction Processing: Performing transactions such as transfers between accounts.
+The microservice will implement CRUD (Create, Read, Update, Delete) operations for various entities related to banking 
+operations. This includes:
+
+- User Module for Authentication: This module is essential for secure access to the banking system. It involves user
+  authentication using a username and password, ensuring that only authorized individuals can access sensitive banking
+  information and perform transactions. 
+
+- Client Management: Managing client information and profiles, ensuring accurate and up-to-date information is available.
+
+- Account Management: Creating, updating, and deleting client accounts. The management of various types of accounts that 
+  clients may hold, providing flexibility in handling different banking needs.
+
+- Balance Inquiry: Retrieving account balances and transaction history. This feature enables clients to view their 
+  current account balances and past transactions, offering transparency and control over their financial activities.
+
+- Transaction Processing: Performing transactions such as transfers between accounts. 
+
 
 #### User controllers
 | HTTP METHOD | PATH                   | USAGE             |
